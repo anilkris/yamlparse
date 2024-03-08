@@ -1,5 +1,5 @@
 import os
-from src.operations.file_operations import clear_directory, split_file_at_marker, group_files_by_keyword
+from src.operations.file_operations import clear_directory, ensure_directory_exists, split_file_at_marker, group_files_by_keyword
 from src.operations.yaml_operations import parse_yaml_and_create_files, split_helm_output,find_folder_name_from_yaml_files,extract_and_save_content
 from src.operations.cert_operations import extract_certificates_from_file, printcerts
 from src.utils.path_utils import get_resource_directories
@@ -12,8 +12,10 @@ def main():
         print_message("Starting the application...")
 
         # Define paths for input and output files based on the project directories
-        input_file_path = os.path.join(input_directory, 'demo.yaml')
+        input_file_path = os.path.join(input_directory, 'input.yaml')
         output_dir = os.path.join(output_directory, 'dryrun_output')
+
+        ensure_directory_exists(output_directory)
 
         clear_directory(output_directory)
 

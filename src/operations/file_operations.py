@@ -81,3 +81,13 @@ def clear_directory(directory_path):
                 shutil.rmtree(file_path)
         except Exception as e:
             print(f"Failed to delete {file_path}. Reason: {e}")
+
+def ensure_directory_exists(directory_path):
+    """
+    Checks if a directory exists, and if not, creates it.
+    """
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+        print(f"Directory created: {directory_path}")
+    else:
+        print(f"Directory already exists: {directory_path}")
