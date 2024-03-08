@@ -37,5 +37,3 @@ def printcerts( certificates):
     for cert_pem in unique_certificates:
         cert_info = get_certificate_info(cert_pem)
         print(cert_info)
-
-
