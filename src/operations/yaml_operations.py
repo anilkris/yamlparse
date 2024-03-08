@@ -101,6 +101,5 @@ def extract_and_save_content(input_file_path, start_marker, mid_marker, first_se
     with open(second_section_file_path, 'w') as file:
         file.write(second_section)
 
-    # Depending on your needs, you could also return the paths of the saved files
     return first_section_file_path, second_section_file_path
 
