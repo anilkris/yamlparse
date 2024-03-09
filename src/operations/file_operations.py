@@ -3,6 +3,8 @@ import shutil
 
 import yaml
 
+from src.utils.print_utils import log_info
+
 def extract_stringData_secrets(yaml_file_path, output_directory):
 
     with open(yaml_file_path, 'r') as file:
@@ -11,7 +13,7 @@ def extract_stringData_secrets(yaml_file_path, output_directory):
     parsed_yaml = yaml.safe_load(yaml_content)
 
     if parsed_yaml.get('kind') != 'Secret':
-       print("The file is not of kind 'Secret'. No further action will be taken.")
+       log_info("The file is not of kind 'Secret'. No further action will be taken.")
        return
 
     if 'stringData' in parsed_yaml:
@@ -21,7 +23,9 @@ def extract_stringData_secrets(yaml_file_path, output_directory):
             with open(new_file_path, 'w') as new_file:
                 new_file.write(value.replace('\\n', '\n'))
     else:
-        print("No 'stringData' found to process.")
+        log_info("No 'stringData' found to process.")
+
+
 
 def split_file_at_marker(input_file_path, before_marker_file_path, after_marker_file_path, marker='---'):
     write_to_before = True
@@ -64,7 +68,7 @@ def move_file_to_matching_directory(file_path, service_name, output_directory):
         new_file_path = os.path.join(matching_directory, os.path.basename(file_path))
         shutil.move(file_path, new_file_path)
     else:
-        print(f"No matching directory found for {service_name}. File remains in {output_directory}")
+        log_info(f"No matching directory found for {service_name}. File remains in {output_directory}")
 
 
 
@@ -85,8 +89,9 @@ def group_files_by_keyword(source_dir, keywords):
                 new_file_name = file_name.replace(keyword, '').replace('_','')
                 dest_path = os.path.join(source_dir, keyword, new_file_name)
                 shutil.move(file_path, dest_path)
-                print(f"Moved '{file_name}' to '{dest_path}'")
+                log_info(f"Moved '{file_name}' to '{dest_path}'")
                 if dest_path.__contains__("Secret"):
+                    
                     extract_stringData_secrets(dest_path, os.path.dirname(dest_path))
                 break
 
@@ -102,7 +107,8 @@ def clear_directory(directory_path):
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
         except Exception as e:
-            print(f"Failed to delete {file_path}. Reason: {e}")
+            log_info(f"Failed to delete {file_path}. Reason: {e}")
+
 
 def ensure_directory_exists(directory_path):
     """
@@ -110,6 +116,6 @@ def ensure_directory_exists(directory_path):
     """
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
-        print(f"Directory created: {directory_path}")
+        log_info(f"Directory created: {directory_path}")
     else:
-        print(f"Directory already exists: {directory_path}")
+        log_info(f"Directory already exists: {directory_path}")

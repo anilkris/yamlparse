@@ -2,6 +2,8 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 import re
 
+from src.utils.print_utils import log_info
+
 def extract_certificates_from_file(file_path):
     with open(file_path, 'r') as file:
         file_content = file.read()
@@ -16,8 +18,8 @@ def get_certificate_info(cert_pem):
 
     subject = cert.subject.rfc4514_string()
     issuer = cert.issuer.rfc4514_string()
-    valid_from = cert.not_valid_before
-    valid_until = cert.not_valid_after
+    valid_from = cert.not_valid_before_utc
+    valid_until = cert.not_valid_after_utc
     serial_number = cert.serial_number
 
     info = {
@@ -36,4 +38,4 @@ def printcerts( certificates):
 
     for cert_pem in unique_certificates:
         cert_info = get_certificate_info(cert_pem)
-        print(cert_info)
+        log_info(cert_info)

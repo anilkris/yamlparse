@@ -2,7 +2,9 @@ import os
 import yaml
 
 from src.operations.file_operations import move_file_to_matching_directory
+from src.utils.print_utils import log_info
 
+availableServices=[]
 def split_helm_output(input_file, output_dir):
     """
     Splits a Helm output file into separate YAML files for each Kubernetes resource.
@@ -17,6 +19,8 @@ def split_helm_output(input_file, output_dir):
                 continue
             kind = doc.get('kind', 'UnknownKind')
             name = doc['metadata']['name']
+            # if(kind == 'Secret') or (kind == 'ConfigMap') or (kind == 'Service'):
+            addNameToAvailableServices(name)
             file_name = f"{kind}_{name}.yaml"
             with open(os.path.join(output_dir, file_name), 'w') as outfile:
                 yaml.dump(doc, outfile, default_flow_style=False)
@@ -38,10 +42,10 @@ def parse_yaml_and_create_files(yaml_files, output_directory):
         output_file_path = os.path.join(output_directory, f"{service}_values.yaml")
         with open(output_file_path, 'w') as file:
             yaml.dump({service: values}, file, default_flow_style=False)
-        print(f"File created for {service}: {output_file_path}")
+        log_info(f"File created for {service}: {output_file_path}")
         move_file_to_matching_directory(output_file_path, service, output_directory)
 
-def filter_sensitive_values(service_values, keys_to_remove=['certificate', 'key', 'roleRightsMap']):
+def filter_sensitive_values(service_values, keys_to_remove=['certificate', 'key', 'jwt']):
     """
     Recursively filters out sensitive values from a dictionary based on the specified keys.
     """
@@ -55,15 +59,18 @@ def filter_sensitive_values(service_values, keys_to_remove=['certificate', 'key'
     return replace_sensitive_values(service_values)
 
 
-def find_folder_name_from_yaml_files(directory_path):
-    folder_names = []
 
-    for file_name in os.listdir(directory_path):
-        if file_name.startswith('Pod_') and file_name.endswith('-test-connection.yaml'):
-            clean_name = file_name[len('Pod_'):-len('-test-connection.yaml')]
-            folder_names.append(clean_name)
+def addNameToAvailableServices(name):
+    if isinstance(name, str ) and name not in availableServices:
+        availableServices.append(name)
+    else:
+        return
+    
 
-    return folder_names
+
+def getAvailableServices(): 
+    return availableServices
+
 
 def extract_and_save_content(input_file_path, start_marker, mid_marker, first_section_file_path, second_section_file_path, end_marker=None):
     """
