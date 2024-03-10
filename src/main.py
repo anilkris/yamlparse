@@ -48,7 +48,7 @@ def main():
         else:
             log_info("No certificates found.")
 
-        print_message("Application executed successfully.\nOuput: "+ output_dir);
+        print_message("Application executed successfully.\nOuput: "+ output_dir)
     except Exception as e:
         log_error(f"An error occurred: {str(e)}")
         print_message("An error occurred, check the logs for details.")

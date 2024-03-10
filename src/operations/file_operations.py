@@ -3,6 +3,8 @@ import shutil
 
 import yaml
 
+import json
+from pathlib import Path
 from src.utils.print_utils import log_info
 
 def extract_stringData_secrets(yaml_file_path, output_directory):
@@ -22,6 +24,8 @@ def extract_stringData_secrets(yaml_file_path, output_directory):
         
             with open(new_file_path, 'w') as new_file:
                 new_file.write(value.replace('\\n', '\n'))
+            current_directory = os.path.dirname(new_file_path)
+            convert_to_json(new_file.name, current_directory)
     else:
         log_info("No 'stringData' found to process.")
 
@@ -90,9 +94,10 @@ def group_files_by_keyword(source_dir, keywords):
                 dest_path = os.path.join(source_dir, keyword, new_file_name)
                 shutil.move(file_path, dest_path)
                 log_info(f"Moved '{file_name}' to '{dest_path}'")
+                current_directory = os.path.dirname(dest_path)
+                convert_to_json(dest_path, current_directory)
                 if dest_path.__contains__("Secret"):
-                    
-                    extract_stringData_secrets(dest_path, os.path.dirname(dest_path))
+                    extract_stringData_secrets(dest_path, current_directory)
                 break
 
 def clear_directory(directory_path):
@@ -119,3 +124,21 @@ def ensure_directory_exists(directory_path):
         log_info(f"Directory created: {directory_path}")
     else:
         log_info(f"Directory already exists: {directory_path}")
+
+
+def convert_to_json(filename, dirpath):
+    yaml_file_path = Path(dirpath) / filename
+    with open(yaml_file_path, 'r') as yaml_file:
+        yaml_content = yaml.safe_load(yaml_file)  # Load the YAML content
+                
+                # Ensure a 'json' directory exists in the current directory
+    json_dir = Path(dirpath) / 'json'
+    json_dir.mkdir(exist_ok=True)
+                
+    json_content = json.dumps(yaml_content, indent=4)  # Convert YAML content to JSON string
+    json_file_path = json_dir / f"{yaml_file_path.stem}.json"  # Define JSON file path
+                
+                # Write the JSON content to the new file
+    with open(json_file_path, 'w') as json_file:
+        json_file.write(json_content)
+    return yaml_file_path,json_file_path
