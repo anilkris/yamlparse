@@ -2,3 +2,4 @@
 /resources/input/*
 /resources/output/*
 application.log
+.vscode
