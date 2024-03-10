@@ -129,16 +129,14 @@ def ensure_directory_exists(directory_path):
 def convert_to_json(filename, dirpath):
     yaml_file_path = Path(dirpath) / filename
     with open(yaml_file_path, 'r') as yaml_file:
-        yaml_content = yaml.safe_load(yaml_file)  # Load the YAML content
+        yaml_content = yaml.safe_load(yaml_file)
                 
-                # Ensure a 'json' directory exists in the current directory
     json_dir = Path(dirpath) / 'json'
     json_dir.mkdir(exist_ok=True)
                 
-    json_content = json.dumps(yaml_content, indent=4)  # Convert YAML content to JSON string
-    json_file_path = json_dir / f"{yaml_file_path.stem}.json"  # Define JSON file path
+    json_content = json.dumps(yaml_content, indent=4)
+    json_file_path = json_dir / f"{yaml_file_path.stem}.json"
                 
-                # Write the JSON content to the new file
     with open(json_file_path, 'w') as json_file:
         json_file.write(json_content)
     return yaml_file_path,json_file_path
